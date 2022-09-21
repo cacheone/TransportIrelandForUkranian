@@ -1,26 +1,17 @@
-from flask import render_template, request, redirect, flash
-
+from flask import render_template, request, redirect, flash, Blueprint
 from app.models import TripDriver, Place, db
 from app.forms import NewtripForm
-from app import app, config
 
+mainroute = Blueprint('mainroute', __name__)
 
-country = '/' + config.COUNTRY
-
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
-@app.route(country+'/savetrip/', methods=['POST'])
+@mainroute.route('/savetrip',  methods=['POST'])
 def savetrip():
 
     form = NewtripForm(request.form)
     if not form.validate():
         flash(request.url)
 
-        return redirect(country+'/createtrip/1/2222222')
+        return redirect('/createtrip/1/2222222')
 
     townfrom = Place.query.filter_by(name_place=request.form.get('fromplace')).first()
     townto = Place.query.filter_by(name_place=request.form.get('toplace')).first()
@@ -37,11 +28,13 @@ def savetrip():
 
     db.session.add(newtrip)
     db.session.commit()
-    return render_template('gonedriver.html')
+    return render_template('gonetrip.html')
 
 
-@app.route(country+'/createtrip/<userid>/<userkey>')
+@mainroute.route('/createtrip/<userid>/<userkey>')
 def createtrip(userid, userkey):
+
     towns = Place.query.all()
     driver = {'id': userid, 'key': userkey, 'towns': towns}
-    return render_template('createdriver.html', driver=driver)
+    form = NewtripForm(request.form)
+    return render_template('createtrip.html', driver=driver, form= form)

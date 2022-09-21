@@ -1,0 +1,81 @@
+  {% extends "base.html" %}
+
+    {% block content %}
+
+  <div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">New trip</h1>
+    <div class="col-lg-6 mx-auto">
+
+        <form action="/ireland/savetrip" method="post">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="fromplace" name="fromplace" maxlength="24" minlength="3" placeholder="town/city" list="datalistOptions" required>
+                    <datalist id="datalistOptions">
+
+                      {% for local in driver.towns %}
+                        <option value="{{ local.name_place }}">
+                      {% endfor %}
+                    </datalist>
+              <label for="fromplace">From location</label>
+            </div>
+
+            <div class="form-floating">
+              <input type="text" class="form-control" id="toplace" name="toplace"  maxlength="24" minlength="3" placeholder="town/city" list="datalistOptions" required>
+              <label for="fromplace">To location</label>
+            </div>
+
+            <div class="form-floating">
+                <input id="datetrip" name="datetrip" class="form-control" type="date" min="12.09.2022" required />
+                <label for="datetrip">Date</label>
+            </div>
+
+            <div class="form-floating">
+
+              <select class="form-select form-control-sm mb-3" id="periodtrip" name="periodtrip" required>
+                  <option selected></option>
+                  <option value="1">Mornig</option>
+                  <option value="2">Aftenoon</option>
+                  <option value="3">Evening</option>
+                  <option value="3">Night</option>
+                </select>
+              <label for="periodtrip">Time</label>
+            </div>
+
+            <div class="form-floating">
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Pay €</span>
+                  <input type="text" class="form-control" id="paytrip" name="paytrip"  maxlength="3" minlength="1" aria-label="Euro" required>
+                  <span class="input-group-text">Places</span>
+                  <input type="text" class="form-control" id="seatstrip" name="seatstrip"  maxlength="1" minlength="1"aria-label="Place" required>
+                </div>
+            </div>
+
+            <div class="form-floating">
+                <div class="input-group mb-3">
+                    <textarea class="form-control" id="tripcomment" name="tripcomment" style="resize:none" rows="5" placeholder="Comment" maxlength="255" minlength="5" required></textarea>
+                </div>
+            </div>
+            <div>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <ul class=flashes>
+                    {% for message in messages %}
+                      <li>{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endwith %}
+            </div>
+            <div class="form-floating">
+                <input type="hidden" id="userid" name="userid" value={{ driver.id }} >
+                <input type="hidden" id="userkey" name="userkey" value={{ driver.key }} >
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Save trip</button>
+            </div>
+
+        </form>
+
+
+    </div>
+  </div>
+
+
+    {% endblock %}

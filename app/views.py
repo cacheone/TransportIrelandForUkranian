@@ -10,8 +10,10 @@ def savetrip():
     form = NewtripForm(request.form)
     if not form.validate():
         flash(request.url)
-
-        return redirect('/createtrip/1/2222222')
+        towns = Place.query.all()
+        driver = {'id': request.form.get('userid'), 'key': 222222, 'towns': towns}
+        form.toplace.errors.append("!!!")
+        return render_template('createtrip.html', driver=driver, form=form)
 
     townfrom = Place.query.filter_by(name_place=request.form.get('fromplace')).first()
     townto = Place.query.filter_by(name_place=request.form.get('toplace')).first()
@@ -31,10 +33,10 @@ def savetrip():
     return render_template('gonetrip.html')
 
 
-@mainroute.route('/createtrip/<userid>/<userkey>')
+@mainroute.route('/createtrip/<userid>/<userkey>', methods=['GET', 'POST'])
 def createtrip(userid, userkey):
 
     towns = Place.query.all()
     driver = {'id': userid, 'key': userkey, 'towns': towns}
     form = NewtripForm(request.form)
-    return render_template('createtrip.html', driver=driver, form= form)
+    return render_template('createtrip.html', driver=driver, form=form)

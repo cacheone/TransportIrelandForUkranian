@@ -9,5 +9,3 @@ config = Config()
 app.config.from_object(config)
 db.init_app(app)
 app.register_blueprint(mainroute)
-
-

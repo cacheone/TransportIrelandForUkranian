@@ -54,3 +54,7 @@ class Place(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name_place = db.Column(db.String(64), nullable=False, unique=True, index=True)
+
+    @staticmethod
+    def getidtown(town: str) -> int:
+        return Place.query.filter_by(name_place=town.title()).first()

@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
+
 db = SQLAlchemy()
 
 
@@ -47,7 +48,13 @@ class User(db.Model):
     key = db.Column(db.String(32), nullable=False, unique=True)
     contact = db.Column(db.String(32), nullable=False, unique=True)
     created_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    # block = db.Column(db.Boolean)
 
+    @staticmethod
+    def getkey(userid: str) -> str:
+        userkey = User.query.get(int(userid.title()))
+        if userkey is not None:
+            return userkey.key
 
 class Place(db.Model):
     __tablename__ = 'places_irish'
@@ -57,4 +64,6 @@ class Place(db.Model):
 
     @staticmethod
     def getidtown(town: str) -> int:
-        return Place.query.filter_by(name_place=town.title()).first()
+        townid = Place.query.filter_by(name_place=town.title()).first()
+        if townid is not None:
+            return townid.id

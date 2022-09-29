@@ -8,6 +8,8 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     COUNTRY = 'Ireland'
+    TIMETRIP = {1: 'Mornig', 2: 'Aftenoon', 3: 'Evening', 4: 'Night'}
+    TELEGRAMBOT = '@irishpasseger'
 
     LOGGING_CONFIG = {
         'version': 1,

@@ -9,9 +9,9 @@
 
 
         <form action="/savetrip" method="post">
-            {{form.csrf_token}}
+
             <div class="form-floating">
-              <input type="text" class="form-control" id="fromplace" name="fromplace" maxlength="32" minlength="3" placeholder="town/city" list="datalistOptions" required value = "{{ form.fromplace.data }}">
+              <input type="text" class="form-control" id="fromplace" name="fromplace" maxlength="32" minlength="3" placeholder="town/city" list="datalistOptions" required value="{{ form.fromplace.data if form.fromplace.data != None else ''}}">
                     <datalist id="datalistOptions">
 
                       {% for local in towns %}
@@ -33,35 +33,60 @@
             </div>
 
             <div class="form-floating">
-              <input type="text" class="form-control" id="toplace" name="toplace"  maxlength="32" minlength="3" placeholder="town/city" list="datalistOptions" required>
+              <input type="text" class="form-control" id="toplace" name="toplace"  maxlength="32" minlength="3" placeholder="town/city" list="datalistOptions" required value="{{ form.toplace.data if form.toplace.data != None else ''}}">
               <label for="toplace">To location</label>
                 <div>
+                    {% if form.toplace.errors %}
+                        <div class="alert alert-danger" role="alert">
+                             {% for message in form.toplace.errors %}
+                              {{ message }}<br>
+                            {% endfor %}
 
+                        </div>
+                    {% endif %}
 
                 </div>
             </div>
 
             <div class="form-floating">
-                <input id="datetrip" name="datetrip" class="form-control" type="date" min="12.09.2022" required />
+                <input id="datetrip" name="datetrip" class="form-control" type="date" startDate="10/01/2022" required value="{{ form.datetrip.data if form.datetrip.data != None else ''}}" />
                 <label for="datetrip">Date</label>
                 <div>
+                    {% if form.datetrip.errors %}
+                        <div class="alert alert-danger" role="alert">
+                             {% for message in form.datetrip.errors %}
+                              {{ message }}<br>
+                            {% endfor %}
 
+                        </div>
+                    {% endif %}
                 </div>
+
 
             </div>
 
             <div class="form-floating">
+                              <select class="form-select form-control-sm mb-3" id="periodtrip" name="periodtrip" required>
 
-              <select class="form-select form-control-sm mb-3" id="periodtrip" name="periodtrip" required>
-                  <option selected></option>
-                  <option value="1">Mornig</option>
-                  <option value="2">Aftenoon</option>
-                  <option value="3">Evening</option>
-                  <option value="3">Night</option>
+                  <option value=""> </option>
+                  {% for i, typetime in timetrip.items() %}
+
+                    <option value="{{i}}" {{'selected' if i==form.periodtrip.data|int()}}> {{typetime}} </option>
+
+                  {% endfor %}
+
+
                 </select>
               <label for="periodtrip">Time</label>
-                <div>
+                 <div>
+                    {% if form.datetrip.errors %}
+                        <div class="alert alert-danger" role="alert">
+                             {% for message in form.datetrip.errors %}
+                              {{ message }}<br>
+                            {% endfor %}
 
+                        </div>
+                    {% endif %}
                 </div>
 
             </div>
@@ -69,17 +94,51 @@
             <div class="form-floating">
                 <div class="input-group mb-3">
                   <span class="input-group-text">Pay €</span>
-                  <input type="text" class="form-control" id="paytrip" name="paytrip"  maxlength="3" minlength="1" aria-label="Euro" required>
+                  <input type="number" class="form-control" id="paytrip" name="paytrip" min="1" max="500"   maxlength="3" minlength="1" aria-label="Euro" required value="{{ form.paytrip.data if form.paytrip.data != None else ''}}">
                   <span class="input-group-text">Places</span>
-                  <input type="text" class="form-control" id="seatstrip" name="seatstrip"  maxlength="1" minlength="1" aria-label="Place" required>
+                  <input type="number" class="form-control" id="seatstrip" name="seatstrip" min="1" max="7" maxlength="1" minlength="1" aria-label="Place" required value="{{ form.seatstrip.data if form.seatstrip.data != None else ''}}">
                 </div>
             </div>
+             <div>
+                    {% if form.paytrip.errors %}
+                        <div class="alert alert-danger" role="alert">
+                             {% for message in form.paytrip.errors %}
+                              {{ message }}<br>
+                            {% endfor %}
+
+                        </div>
+                    {% endif %}
+                </div>
+             <div>
+                    {% if form.seatstrip.errors %}
+                        <div class="alert alert-danger" role="alert">
+                             {% for message in form.seatstrip.errors %}
+                              {{ message }}<br>
+                            {% endfor %}
+
+                        </div>
+                    {% endif %}
+                </div>
+
 
             <div class="form-floating">
                 <div class="input-group mb-3">
-                    <textarea class="form-control" id="tripcomment" name="tripcomment" style="resize:none" rows="5" placeholder="Comment" maxlength="255" minlength="5" required></textarea>
+                    <textarea class="form-control" id="tripcomment" name="tripcomment" style="resize:none" rows="5" placeholder="Comment" maxlength="255" minlength="5" required>{{ form.tripcomment.data if form.tripcomment.data != None else ''}}</textarea>
                 </div>
             </div>
+
+            <div>
+                    {% if form.tripcomment.errors %}
+                        <div class="alert alert-danger" role="alert">
+                             {% for message in form.tripcomment.errors %}
+                              {{ message }}<br>
+                            {% endfor %}
+
+                        </div>
+                    {% endif %}
+                </div>
+
+
             <div>
                 {% with messages = get_flashed_messages() %}
                   {% if messages %}
@@ -93,6 +152,7 @@
             </div>
             <div class="form-floating">
                 <input type="hidden" id="userid" name="userid" value={{user.id}}>
+                {{form.csrf_token}}
                 <input type="hidden" id="userkey" name="userkey" value={{user.key}}>
                 <button class="w-100 btn btn-lg btn-primary" type="submit">Save trip</button>
             </div>

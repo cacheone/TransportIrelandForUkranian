@@ -1,11 +1,11 @@
 from flask import render_template, request, flash
-from app.models import TripDriver, Place, db
+from app.models import TripDriver, Place, User, db
 from app.forms import NewtripForm
 from config import Config
 import logging.config
 
-
-logging.config.dictConfig(Config.LOGGING_CONFIG)
+config = Config()
+logging.config.dictConfig(config.LOGGING_CONFIG)
 logger = logging.getLogger('passeger')
 
 
@@ -15,67 +15,64 @@ def index():
 
 def savetrip():
     form = NewtripForm(request.form)
-    if not form.validate():
+    if not form.validate_on_submit():
         logger.debug('Not valid form')
-        return fill_form(form, flashtext='Not valid form')
+        return fill_form(form)
 
-    townfromId = Place.getidtown(town=form.fromplace.data)
-    towntoId = Place.getidtown(town=form.toplace.data)
+    form.userkeydb = User.getkey(userid=form.userid.data)
+    if not form.checkuser():
+        logger.debug('Not valid user')
+        return fill_form(form, flashtext='Users error')
 
-    if not checklocate(townfromId, towntoId, form):
+    form.townfromid = Place.getidtown(town=form.fromplace.data)
+    form.towntoid = Place.getidtown(town=form.toplace.data)
+
+    if not form.checklocate():
         logger.debug('Not valid towns')
         logger.debug(form.fromplace.data)
         logger.debug(form.toplace.data)
-        return fill_form(form, flashtext='Not valid towns')
+        return fill_form(form)
 
-    if not saveindatabase(townfromId, towntoId, form):
+    if not saveindatabase(form):
         logger.debug('Not work database')
         return fill_form(form, flashtext='Not work database')
-
 
     return render_template('gonetrip.html')
 
 
-def checklocate(townfromId,towntoId, form):
-    result = True
-    if townfromId == None:
-        form.fromplace.errors.append('Not found town')
-        result = False
-    if towntoId == None:
-        form.toplace.errors.append('Not found town')
-        result = False
-    return result
-
-def saveindatabase(townfrom, townto, form):
+def saveindatabase(form):
     newtrip = TripDriver()
-    newtrip.from_place = townfrom.id
-    newtrip.to_place = townto.id
+    newtrip.from_place = form.townfromid
+    newtrip.to_place = form.towntoid
     newtrip.driver_id = form.userid.data
     newtrip.seat = form.seatstrip.data
     newtrip.date_order = form.datetrip.data
     newtrip.pay = form.paytrip.data
     newtrip.period_order = form.periodtrip.data
     newtrip.comment = form.tripcomment.data
+
     try:
         db.session.add(newtrip)
         db.session.commit()
     except:
+        logging.error('Error database')
         return False
     return True
 
-def fill_form(form, userid='', userkey='', flashtext=''):
-    if userid == '':
-        userid = form.userid.data
-    if userkey == '':
-        userkey = form.userkey.data
-    if not flashtext == '':
-        flash('Error: ' + flashtext)
-    towns = Place.query.all()
-    user = {'id': userid, 'key': userkey}
 
-    return render_template('newtrip.html', user=user, towns=towns, form=form)
+def fill_form(form, flashtext=''):
+    if not flashtext == '':
+        flash(flashtext)
+    timetrip = config.TIMETRIP
+    towns = Place.query.all()
+    user = {'id': form.userid.data, 'key': form.userkey.data}
+
+    return render_template('newtrip.html', user=user, towns=towns, form=form, timetrip=timetrip)
 
 
 def newtrip(userid, userkey):
     form = NewtripForm(request.form)
-    return fill_form(form, userid, userkey)
+    timetrip = config.TIMETRIP
+    towns = Place.query.all()
+    user = {'id': userid, 'key': userkey}
+    return render_template('newtrip.html', user=user, towns=towns, form=form, timetrip=timetrip)

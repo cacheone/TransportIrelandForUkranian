@@ -14,6 +14,6 @@ def savetrip():
     return passeger.savetrip()
 
 
-@mainroute.route('/newtrip/<userid>/<userkey>', methods=['GET', 'POST'])
+@mainroute.route('/newtrip/<int:userid>/<userkey>', methods=['GET'])
 def newtrip(userid, userkey):
     return passeger.newtrip(userid, userkey)

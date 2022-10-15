@@ -16,7 +16,6 @@ class NewtripForm(FlaskForm):
 
     townfromid = IntegerField('townfromid')
     towntoid = IntegerField('towntoid')
-    userkeydb = StringField('userkeydb')
 
     def checklocate(self):
         result = True
@@ -28,7 +27,3 @@ class NewtripForm(FlaskForm):
             result = False
         return result
 
-    def checkuser(self):
-        if self.userkey.data == self.userkeydb:
-            return True
-        return False

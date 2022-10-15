@@ -11,13 +11,16 @@ logger = logging.getLogger('passeger')
 
 def check_user(function_to_decorate):
     def the_wrapper_around(form):
-        userid=int(form.userid.data)
-        form.userkeydb = User.getkey(userid=userid)
-        if not form.checkuser():
+        if not check_user_key(int(form.userid.data), form.userkey.data):
             logger.debug('Not valid user')
             return fill_form(form, flashtext='Users error')
         return function_to_decorate(form)
+
     return the_wrapper_around
+
+
+def check_user_key(userid: int, userkey: str) -> bool:
+    return userkey == User.getkey(userid)
 
 
 def index():
@@ -41,28 +44,27 @@ def sevetripform(form):
         logger.debug(form.fromplace.data)
         logger.debug(form.toplace.data)
         return fill_form(form)
-    if not saveindatabase(form):
-        return fill_form(form, flashtext='Not work database')
+    saveindatabase(form)
     return render_template('gonetrip.html')
 
 
 def saveindatabase(form):
-    newtrip = TripDriver()
-    newtrip.from_place = form.townfromid
-    newtrip.to_place = form.towntoid
-    newtrip.driver_id = form.userid.data
-    newtrip.seat = form.seatstrip.data
-    newtrip.date_order = form.datetrip.data
-    newtrip.pay = form.paytrip.data
-    newtrip.period_order = form.periodtrip.data
-    newtrip.comment = form.tripcomment.data
+    trip = TripDriver()
+    trip.from_place = form.townfromid
+    trip.to_place = form.towntoid
+    trip.driver_id = form.userid.data
+    trip.seat = form.seatstrip.data
+    trip.date_order = form.datetrip.data
+    trip.pay = form.paytrip.data
+    trip.period_order = form.periodtrip.data
+    trip.comment = form.tripcomment.data
 
     try:
-        db.session.add(newtrip)
+        db.session.add(trip)
         db.session.commit()
     except:
         logging.error('Error database')
-        return False
+        raise
     return True
 
 
@@ -73,9 +75,9 @@ def fill_form(form, flashtext=''):
 
 
 def newtrip(userid, userkey):
-    if not userkey == User.getkey(userid):
-            logger.debug('Not valid user')
-            return render_template('error.html')
+    if not check_user_key(userid, userkey):
+        logger.debug('Not valid user')
+        return render_template('error.html')
     form = NewtripForm(request.form)
     return open_form(form, userid, userkey)
 

@@ -1,9 +1,7 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
-
 db = SQLAlchemy()
-
 
 class OrderPassenger(db.Model):
     __tablename__ = 'orders_irish'

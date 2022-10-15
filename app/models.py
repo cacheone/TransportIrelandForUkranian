@@ -51,8 +51,10 @@ class User(db.Model):
     # block = db.Column(db.Boolean)
 
     @staticmethod
-    def getkey(userid: str) -> str:
-        userkey = User.query.get(int(userid.title()))
+    def getkey(userid: int) -> str:
+        print(userid)
+        userkey = User.query.get(userid)
+
         if userkey is not None:
             return userkey.key
 
